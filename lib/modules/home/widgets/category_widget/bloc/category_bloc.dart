@@ -26,8 +26,7 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
           categories: categories,
         ),
       );
-    } catch (error, stacktrace) {
-      print(stacktrace);
+    } catch (error) {
       emit(state.copyWith(status: CategoryStatus.error));
     }
   }

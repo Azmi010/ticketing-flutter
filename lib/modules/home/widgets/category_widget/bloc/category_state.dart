@@ -15,9 +15,8 @@ class CategoryState extends Equatable {
   const CategoryState({
     this.status = CategoryStatus.initial,
     List<Category>? categories,
-    int idSelected = 0,
-  })  : categories = categories ?? const [],
-        idSelected = idSelected;
+    this.idSelected = 0,
+  })  : categories = categories ?? const [];
 
   final List<Category> categories;
   final CategoryStatus status;

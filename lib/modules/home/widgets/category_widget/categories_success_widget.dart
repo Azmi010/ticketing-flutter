@@ -28,7 +28,7 @@ class CategoriesSuccessWidget extends StatelessWidget {
               );
             },
             scrollDirection: Axis.horizontal,
-            separatorBuilder: (_, __) => SizedBox(
+            separatorBuilder: (_, _) => SizedBox(
               width: 16.0,
             ),
             itemCount: state.categories.length,

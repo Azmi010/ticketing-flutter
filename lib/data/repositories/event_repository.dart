@@ -36,4 +36,26 @@ class EventRepository {
       ),
     ];
   }
+
+  Future<List<Category>> getBrowseCategories() async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    return [
+      Category(id: 1, name: "Music"),
+      Category(id: 2, name: "Arts & Theatre"),
+      Category(id: 3, name: "Sports"),
+      Category(id: 4, name: "Workshops"),
+    ];
+  }
+
+  Future<List<Event>> getWeekendEvents() async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    final allEvents = await getEvents();
+    return allEvents.take(14).toList();
+  }
+
+  Future<List<Event>> getFreeEvents() async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    final allEvents = await getEvents();
+    return allEvents.where((event) => event.price == 0).toList();
+  }
 }
