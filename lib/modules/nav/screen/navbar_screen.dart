@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:ticketing_flutter/core/constants/app_color.dart';
 import 'package:ticketing_flutter/modules/explore/screen/explore_screen.dart';
 import 'package:ticketing_flutter/modules/home/screen/home_screen.dart';
+import 'package:ticketing_flutter/modules/myticket/screen/myticket_screen.dart';
+import 'package:ticketing_flutter/modules/profile/screen/profile_screen.dart';
 
 class NavbarScreen extends StatefulWidget {
   const NavbarScreen({super.key});
@@ -16,8 +18,8 @@ class _NavbarScreenState extends State<NavbarScreen> {
   final List<Widget> _screens = [
     const HomeScreen(),
     const ExploreScreen(),
-    const Center(child: Text("My Tickets")),
-    const Center(child: Text("Profile")),
+    const MyTicketScreen(),
+    const ProfileScreen(),
   ];
   @override
   Widget build(BuildContext context) {
