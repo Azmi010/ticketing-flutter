@@ -5,14 +5,14 @@ import 'package:ticketing_flutter/modules/home/screen/home_screen.dart';
 import 'package:ticketing_flutter/modules/myticket/screen/myticket_screen.dart';
 import 'package:ticketing_flutter/modules/profile/screen/profile_screen.dart';
 
-class NavbarScreen extends StatefulWidget {
-  const NavbarScreen({super.key});
+class NavbarUserScreen extends StatefulWidget {
+  const NavbarUserScreen({super.key});
 
   @override
-  State<NavbarScreen> createState() => _NavbarScreenState();
+  State<NavbarUserScreen> createState() => _NavbarUserScreenState();
 }
 
-class _NavbarScreenState extends State<NavbarScreen> {
+class _NavbarUserScreenState extends State<NavbarUserScreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _screens = [

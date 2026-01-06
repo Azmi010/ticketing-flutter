@@ -31,11 +31,22 @@ class LoginScreen extends StatelessWidget {
               BlocConsumer<AuthBloc, AuthState>(
                 listener: (context, state) {
                   if (state is AuthSuccess) {
-                    Navigator.pushReplacementNamed(context, '/login');
+                    final userRole = state.user.role?.name.toLowerCase();
+                    
+                    if (userRole == 'admin') {
+                      Navigator.pushReplacementNamed(context, '/admin');
+                    } else {
+                      Navigator.pushReplacementNamed(context, '/user');
+                    }
                   } else if (state is AuthFailure) {
                     ScaffoldMessenger.of(
                       context,
-                    ).showSnackBar(SnackBar(content: Text(state.error)));
+                    ).showSnackBar(
+                      SnackBar(
+                        content: Text(state.error),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
                   }
                 },
                 builder: (context, state) {
