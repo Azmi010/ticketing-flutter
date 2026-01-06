@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import '../../../../data/models/ticket_model.dart';
+import '../../../../data/models/order_model.dart';
 import 'events_by_status_card.dart';
 
 class EventsByStatusSuccess extends StatelessWidget {
-  final List<Ticket> tickets;
+  final List<Order> orders;
 
-  const EventsByStatusSuccess({super.key, required this.tickets});
+  const EventsByStatusSuccess({super.key, required this.orders});
 
   @override
   Widget build(BuildContext context) {
-    if (tickets.isEmpty) {
+    if (orders.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -34,9 +34,9 @@ class EventsByStatusSuccess extends StatelessWidget {
 
     return ListView.builder(
       padding: const EdgeInsets.all(20),
-      itemCount: tickets.length,
+      itemCount: orders.length,
       itemBuilder: (context, index) {
-        return EventsByStatusCard(ticket: tickets[index]);
+        return EventsByStatusCard(order: orders[index]);
       },
     );
   }

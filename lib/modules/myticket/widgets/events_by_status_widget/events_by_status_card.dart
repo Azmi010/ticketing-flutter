@@ -1,13 +1,27 @@
 import 'package:flutter/material.dart';
-import '../../../../data/models/ticket_model.dart';
+import 'package:intl/intl.dart';
+import '../../../../data/models/order_model.dart';
 
 class EventsByStatusCard extends StatelessWidget {
-  final Ticket ticket;
+  final Order order;
 
-  const EventsByStatusCard({super.key, required this.ticket});
+  const EventsByStatusCard({super.key, required this.order});
 
   @override
   Widget build(BuildContext context) {
+    final firstDetail = order.details?.first;
+    final event = firstDetail?.ticket?.event;
+    final eventTitle = event?.title ?? 'Unknown Event';
+    final eventDate = event?.date ?? DateTime.now();
+    final eventLocation = event?.location ?? 'Unknown Location';
+    
+    int totalTickets = 0;
+    if (order.details != null) {
+      for (var detail in order.details!) {
+        totalTickets += detail.qty;
+      }
+    }
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -25,14 +39,13 @@ class EventsByStatusCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Image with status badge
           Stack(
             children: [
               ClipRRect(
                 borderRadius:
                     const BorderRadius.vertical(top: Radius.circular(12)),
-                child: Image.network(
-                  ticket.eventImage,
+                child: Image.asset(
+                  'assets/images/konser.jpg',
                   height: 150,
                   width: double.infinity,
                   fit: BoxFit.cover,
@@ -56,20 +69,20 @@ class EventsByStatusCard extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: _getStatusColor(ticket.status),
+                    color: _getStatusColor(eventDate),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        _getStatusIcon(ticket.status),
+                        _getStatusIcon(eventDate),
                         color: Colors.white,
                         size: 14,
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        _getStatusText(ticket.status),
+                        _getStatusText(eventDate),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 12,
@@ -90,7 +103,7 @@ class EventsByStatusCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  ticket.eventTitle,
+                  eventTitle,
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -107,7 +120,7 @@ class EventsByStatusCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      ticket.formattedDate,
+                      DateFormat('MMM dd, yyyy • HH:mm').format(eventDate),
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey[600],
@@ -124,11 +137,13 @@ class EventsByStatusCard extends StatelessWidget {
                       color: Colors.grey[600],
                     ),
                     const SizedBox(width: 8),
-                    Text(
-                      ticket.eventLocation,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
+                    Expanded(
+                      child: Text(
+                        eventLocation,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                        ),
                       ),
                     ),
                   ],
@@ -151,7 +166,7 @@ class EventsByStatusCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          ticket.ticketInfo,
+                          '$totalTickets x Ticket${totalTickets > 1 ? 's' : ''}',
                           style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
@@ -160,32 +175,60 @@ class EventsByStatusCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    ElevatedButton(
-                      onPressed: () {
-                        // Show QR code
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFF0EDFF),
-                        foregroundColor: const Color(0xFF5A4BE8),
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 10,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          'TOTAL',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.grey[500],
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 0.5,
+                          ),
                         ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                        const SizedBox(height: 4),
+                        Text(
+                          '\$${order.totalPrice.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF5A4BE8),
+                          ),
                         ),
-                      ),
-                      child: const Text(
-                        'View QR',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      ],
                     ),
                   ],
                 ),
+                
+                // Ticket details
+                if (order.details != null && order.details!.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  const Divider(),
+                  const SizedBox(height: 8),
+                  ...order.details!.map((detail) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '${detail.ticket?.name ?? 'Ticket'} x${detail.qty}',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        Text(
+                          '\$${((detail.ticket?.price ?? 0) * detail.qty).toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )),
+                ],
               ],
             ),
           ),
@@ -194,48 +237,30 @@ class EventsByStatusCard extends StatelessWidget {
     );
   }
 
-  Color _getStatusColor(String status) {
-    switch (status) {
-      case 'confirmed':
-        return Colors.grey.shade700;
-      case 'soon':
-        return const Color(0xFF5A4BE8);
-      case 'past':
-        return Colors.grey;
-      case 'canceled':
-        return Colors.red;
-      default:
-        return Colors.grey;
+  Color _getStatusColor(DateTime eventDate) {
+    final now = DateTime.now();
+    if (eventDate.isAfter(now)) {
+      return const Color(0xFF5A4BE8); // Upcoming
+    } else {
+      return Colors.grey; // Past
     }
   }
 
-  IconData _getStatusIcon(String status) {
-    switch (status) {
-      case 'confirmed':
-        return Icons.check_circle;
-      case 'soon':
-        return Icons.access_time;
-      case 'past':
-        return Icons.history;
-      case 'canceled':
-        return Icons.cancel;
-      default:
-        return Icons.info;
+  IconData _getStatusIcon(DateTime eventDate) {
+    final now = DateTime.now();
+    if (eventDate.isAfter(now)) {
+      return Icons.event_available;
+    } else {
+      return Icons.history;
     }
   }
 
-  String _getStatusText(String status) {
-    switch (status) {
-      case 'confirmed':
-        return 'Confirmed';
-      case 'soon':
-        return 'Soon';
-      case 'past':
-        return 'Past';
-      case 'canceled':
-        return 'Canceled';
-      default:
-        return status;
+  String _getStatusText(DateTime eventDate) {
+    final now = DateTime.now();
+    if (eventDate.isAfter(now)) {
+      return 'Upcoming';
+    } else {
+      return 'Past';
     }
   }
 }

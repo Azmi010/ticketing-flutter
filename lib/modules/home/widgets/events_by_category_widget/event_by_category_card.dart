@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ticketing_flutter/data/models/event_model.dart';
+import 'package:ticketing_flutter/modules/home/screen/event_detail_screen.dart';
 
 class EventByCategoryCard extends StatelessWidget {
   final Event event;
@@ -8,7 +9,16 @@ class EventByCategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => EventDetailScreen(eventId: event.id),
+          ),
+        );
+      },
+      child: Container(
       width: 240,
       margin: const EdgeInsets.only(right: 16, bottom: 8),
       decoration: BoxDecoration(
@@ -132,9 +142,7 @@ class EventByCategoryCard extends StatelessWidget {
                     ],
                   ),
                   Text(
-                    event.tickets != null && event.tickets!.isNotEmpty
-                        ? "\$${event.tickets!.first.price.toStringAsFixed(0)}.00"
-                        : "Free",
+                    _getPrice(),
                     style: const TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 16,
@@ -147,6 +155,7 @@ class EventByCategoryCard extends StatelessWidget {
           ),
         ],
       ),
+      ),
     );
   }
 
@@ -154,5 +163,18 @@ class EventByCategoryCard extends StatelessWidget {
     final hour = date.hour.toString().padLeft(2, '0');
     final minute = date.minute.toString().padLeft(2, '0');
     return "$hour:$minute PM";
+  }
+
+  String _getPrice() {
+    if (event.tickets == null || event.tickets!.isEmpty) {
+      return "Free";
+    }
+    
+    final price = event.tickets!.first.price;
+    if (price <= 0) {
+      return "Free";
+    }
+    
+    return "\$${price.toStringAsFixed(0)}.00";
   }
 }

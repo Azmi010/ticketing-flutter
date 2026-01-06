@@ -10,17 +10,31 @@ class EventsByStatusWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<EventByStatusBloc, EventByStatusState>(
       builder: (context, state) {
-        if (state.status == TicketStatus.loading) {
+        if (state.status == OrderStatus.loading) {
           return const Center(
             child: CircularProgressIndicator(
               color: Color(0xFF5A4BE8),
             ),
           );
-        } else if (state.status == TicketStatus.success) {
-          return EventsByStatusSuccess(tickets: state.tickets);
-        } else if (state.status == TicketStatus.error) {
-          return const Center(
-            child: Text("Error loading tickets"),
+        } else if (state.status == OrderStatus.success) {
+          return EventsByStatusSuccess(orders: state.orders);
+        } else if (state.status == OrderStatus.error) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  "Error loading orders",
+                  style: TextStyle(color: Colors.red),
+                ),
+                const SizedBox(height: 8),
+                if (state.errorMessage != null)
+                  Text(
+                    state.errorMessage!,
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+              ],
+            ),
           );
         }
         return const SizedBox();

@@ -1,26 +1,30 @@
 part of 'event_by_status_bloc.dart';
 
-enum TicketStatus { initial, loading, success, error }
+enum OrderStatus { initial, loading, success, error }
 
 class EventByStatusState extends Equatable {
   const EventByStatusState({
-    this.status = TicketStatus.initial,
-    this.tickets = const [],
+    this.status = OrderStatus.initial,
+    this.orders = const [],
+    this.errorMessage,
   });
 
-  final List<Ticket> tickets;
-  final TicketStatus status;
+  final List<Order> orders;
+  final OrderStatus status;
+  final String? errorMessage;
 
   @override
-  List<Object?> get props => [status, tickets];
+  List<Object?> get props => [status, orders, errorMessage];
 
   EventByStatusState copyWith({
-    List<Ticket>? tickets,
-    TicketStatus? status,
+    List<Order>? orders,
+    OrderStatus? status,
+    String? errorMessage,
   }) {
     return EventByStatusState(
-      tickets: tickets ?? this.tickets,
+      orders: orders ?? this.orders,
       status: status ?? this.status,
+      errorMessage: errorMessage ?? this.errorMessage,
     );
   }
 }

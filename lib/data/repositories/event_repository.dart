@@ -20,6 +20,12 @@ class EventRepository {
             id
             name
           }
+          tickets {
+            id
+            name
+            price
+            quota
+          }
         }
       }
     ''';
