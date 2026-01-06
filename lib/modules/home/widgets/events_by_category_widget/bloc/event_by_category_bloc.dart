@@ -20,7 +20,7 @@ class EventByCategoryBloc extends Bloc<EventByCategoryEvent, EventByCategoryStat
       
       final filteredEvents = event.categoryId == 0 
           ? allEvents 
-          : allEvents.where((e) => e.categoryId == event.categoryId).toList();
+          : allEvents.where((e) => e.category?.id == event.categoryId).toList();
 
       emit(state.copyWith(
         status: EventStatus.success,

@@ -60,7 +60,7 @@ class EventByCategoryCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      _getCategoryName(event.categoryId),
+                      event.category?.name ?? 'General',
                       style: const TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
@@ -132,7 +132,9 @@ class EventByCategoryCard extends StatelessWidget {
                     ],
                   ),
                   Text(
-                    "\$${event.price}.00",
+                    event.tickets != null && event.tickets!.isNotEmpty
+                        ? "\$${event.tickets!.first.price.toStringAsFixed(0)}.00"
+                        : "Free",
                     style: const TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 16,
@@ -146,21 +148,6 @@ class EventByCategoryCard extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _getCategoryName(int id) {
-    switch (id) {
-      case 1:
-        return "MUSIC";
-      case 2:
-        return "ART";
-      case 3:
-        return "BUSINESS";
-      case 4:
-        return "TECH";
-      default:
-        return "EVENT";
-    }
   }
 
   String _formatTime(DateTime date) {

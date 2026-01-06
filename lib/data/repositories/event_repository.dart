@@ -1,61 +1,313 @@
+import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:ticketing_flutter/core/config/graphql_config.dart';
 import '../models/category_model.dart';
 import '../models/event_model.dart';
 
 class EventRepository {
-  Future<List<Category>> getCategories() async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    return [
-      Category(id: 0, name: "All Events"),
-      Category(id: 1, name: "Music"),
-      Category(id: 2, name: "Art & Design"),
-      Category(id: 3, name: "Business"),
-      Category(id: 4, name: "Tech"),
-    ];
+  // Get all events
+  Future<List<Event>> getEvents() async {
+    final client = await GraphQLConfig.getClient();
+
+    const String eventsQuery = r'''
+      query GetEvents {
+        events {
+          id
+          title
+          description
+          location
+          date
+          category {
+            id
+            name
+          }
+        }
+      }
+    ''';
+
+    final QueryOptions options = QueryOptions(
+      document: gql(eventsQuery),
+      fetchPolicy: FetchPolicy.networkOnly,
+    );
+
+    final QueryResult result = await client.query(options);
+
+    if (result.hasException) {
+      throw Exception(
+        result.exception?.graphqlErrors.isNotEmpty == true
+            ? result.exception!.graphqlErrors.first.message
+            : 'Failed to load events',
+      );
+    }
+
+    if (result.data == null || result.data!['events'] == null) {
+      return [];
+    }
+
+    final List eventsList = result.data!['events'];
+    return eventsList.map((json) => Event.fromJson(json)).toList();
   }
 
-  Future<List<Event>> getEvents() async {
-    await Future.delayed(const Duration(milliseconds: 800));
-    return [
-      Event(
-        id: 101,
-        title: "Neon Lights Festival 2024",
-        description: "Grand Park Arena",
-        date: DateTime(2024, 10, 12, 20),
-        location: "San Francisco, CA",
-        price: 45,
-        categoryId: 1,
-      ),
-      Event(
-        id: 102,
-        title: "Modern Abstract Exhibition",
-        description: "SF MOMA",
-        date: DateTime(2024, 10, 13, 10),
-        location: "San Francisco, CA",
-        price: 25,
-        categoryId: 2,
-      ),
-    ];
+  // Get single event by ID
+  Future<Event> getEvent(int id) async {
+    final client = await GraphQLConfig.getClient();
+
+    const String eventQuery = r'''
+      query GetEvent($id: Float!) {
+        event(id: $id) {
+          id
+          title
+          description
+          location
+          date
+          category {
+            id
+            name
+          }
+          organizer {
+            id
+            name
+            email
+          }
+          tickets {
+            id
+            name
+            price
+            quota
+          }
+        }
+      }
+    ''';
+
+    final QueryOptions options = QueryOptions(
+      document: gql(eventQuery),
+      variables: {'id': id},
+      fetchPolicy: FetchPolicy.networkOnly,
+    );
+
+    final QueryResult result = await client.query(options);
+
+    if (result.hasException) {
+      throw Exception(
+        result.exception?.graphqlErrors.isNotEmpty == true
+            ? result.exception!.graphqlErrors.first.message
+            : 'Failed to load event',
+      );
+    }
+
+    if (result.data == null || result.data!['event'] == null) {
+      throw Exception('Event not found');
+    }
+
+    return Event.fromJson(result.data!['event']);
+  }
+
+  // Create event
+  Future<Event> createEvent({
+    required String title,
+    required String description,
+    required String location,
+    required DateTime date,
+    required int categoryId,
+    required int organizerId,
+  }) async {
+    final client = await GraphQLConfig.getClient();
+
+    const String createEventMutation = r'''
+      mutation CreateEvent($data: EventInput!) {
+        createEvent(data: $data) {
+          id
+          title
+          description
+          location
+          date
+          category {
+            id
+            name
+          }
+          organizer {
+            id
+            name
+            email
+          }
+        }
+      }
+    ''';
+
+    final formattedDate = '${date.toUtc().toIso8601String().split('.').first}Z';
+    
+    final MutationOptions options = MutationOptions(
+      document: gql(createEventMutation),
+      variables: {
+        'data': {
+          'title': title,
+          'description': description,
+          'location': location,
+          'date': formattedDate,
+          'categoryId': categoryId,
+          'organizerId': organizerId,
+        },
+      },
+    );
+
+    final QueryResult result = await client.mutate(options);
+
+    if (result.hasException) {
+      throw Exception(
+        result.exception?.graphqlErrors.isNotEmpty == true
+            ? result.exception!.graphqlErrors.first.message
+            : 'Failed to create event',
+      );
+    }
+
+    if (result.data == null || result.data!['createEvent'] == null) {
+      throw Exception('Failed to create event');
+    }
+
+    return Event.fromJson(result.data!['createEvent']);
+  }
+
+  // Update event
+  Future<Event> updateEvent({
+    required int id,
+    required String title,
+    required String description,
+    required String location,
+    required DateTime date,
+    required int categoryId,
+    required int organizerId,
+  }) async {
+    final client = await GraphQLConfig.getClient();
+
+    const String updateEventMutation = r'''
+      mutation UpdateEvent($id: Float!, $data: EventInput!) {
+        updateEvent(id: $id, data: $data) {
+          id
+          title
+          description
+          location
+          date
+          category {
+            id
+            name
+          }
+          organizer {
+            id
+            name
+            email
+          }
+        }
+      }
+    ''';
+
+    final formattedDate = '${date.toUtc().toIso8601String().split('.').first}Z';
+
+    final MutationOptions options = MutationOptions(
+      document: gql(updateEventMutation),
+      variables: {
+        'id': id,
+        'data': {
+          'title': title,
+          'description': description,
+          'location': location,
+          'date': formattedDate,
+          'categoryId': categoryId,
+          'organizerId': organizerId,
+        },
+      },
+    );
+
+    final QueryResult result = await client.mutate(options);
+
+    if (result.hasException) {
+      throw Exception(
+        result.exception?.graphqlErrors.isNotEmpty == true
+            ? result.exception!.graphqlErrors.first.message
+            : 'Failed to update event',
+      );
+    }
+
+    if (result.data == null || result.data!['updateEvent'] == null) {
+      throw Exception('Failed to update event');
+    }
+
+    return Event.fromJson(result.data!['updateEvent']);
+  }
+
+  // Delete event
+  Future<bool> deleteEvent(int id) async {
+    final client = await GraphQLConfig.getClient();
+
+    const String deleteEventMutation = r'''
+      mutation DeleteEvent($id: Float!) {
+        deleteEvent(id: $id)
+      }
+    ''';
+
+    final MutationOptions options = MutationOptions(
+      document: gql(deleteEventMutation),
+      variables: {'id': id},
+    );
+
+    final QueryResult result = await client.mutate(options);
+
+    if (result.hasException) {
+      throw Exception(
+        result.exception?.graphqlErrors.isNotEmpty == true
+            ? result.exception!.graphqlErrors.first.message
+            : 'Failed to delete event',
+      );
+    }
+
+    return result.data?['deleteEvent'] ?? false;
+  }
+
+  // Get event categories
+  Future<List<Category>> getCategories() async {
+    final client = await GraphQLConfig.getClient();
+
+    const String categoriesQuery = r'''
+      query GetCategories {
+        eventCategories {
+          id
+          name
+        }
+      }
+    ''';
+
+    final QueryOptions options = QueryOptions(
+      document: gql(categoriesQuery),
+      fetchPolicy: FetchPolicy.networkOnly,
+    );
+
+    final QueryResult result = await client.query(options);
+
+    if (result.hasException) {
+      throw Exception(
+        result.exception?.graphqlErrors.isNotEmpty == true
+            ? result.exception!.graphqlErrors.first.message
+            : 'Failed to load categories',
+      );
+    }
+
+    if (result.data == null || result.data!['eventCategories'] == null) {
+      return [];
+    }
+
+    final List categoriesList = result.data!['eventCategories'];
+    return categoriesList.map((json) => Category.fromJson(json)).toList();
   }
 
   Future<List<Category>> getBrowseCategories() async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    return [
-      Category(id: 1, name: "Music"),
-      Category(id: 2, name: "Arts & Theatre"),
-      Category(id: 3, name: "Sports"),
-      Category(id: 4, name: "Workshops"),
-    ];
+    return getCategories();
   }
 
   Future<List<Event>> getWeekendEvents() async {
-    await Future.delayed(const Duration(milliseconds: 500));
     final allEvents = await getEvents();
-    return allEvents.take(14).toList();
+    return allEvents;
   }
 
   Future<List<Event>> getFreeEvents() async {
-    await Future.delayed(const Duration(milliseconds: 500));
     final allEvents = await getEvents();
-    return allEvents.where((event) => event.price == 0).toList();
+    return allEvents;
   }
 }

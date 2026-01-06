@@ -46,8 +46,9 @@ class MyApp extends StatelessWidget {
             child: MaterialApp(
               debugShowCheckedModeBanner: false,
               title: 'Ticketing App',
-              home: const AuthMiddleware(),
+              initialRoute: '/',
               routes: {
+                '/': (context) => const AuthMiddleware(),
                 '/login': (context) => LoginScreen(),
                 '/user': (context) => const NavbarUserScreen(),
                 '/admin': (context) => const NavbarAdminScreen(),

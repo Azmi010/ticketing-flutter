@@ -102,7 +102,9 @@ class AllEventsItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  "\$${event.price}",
+                  event.tickets != null && event.tickets!.isNotEmpty
+                      ? "\$${event.tickets!.first.price.toStringAsFixed(0)}"
+                      : "Free",
                   style: const TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 16,
