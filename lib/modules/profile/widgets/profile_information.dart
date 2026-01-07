@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 
 class ProfileInformation extends StatelessWidget {
-  const ProfileInformation({super.key});
+  final String name;
+  final String email;
+
+  const ProfileInformation({
+    super.key,
+    required this.name,
+    required this.email,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,53 +24,36 @@ class ProfileInformation extends StatelessWidget {
                 border: Border.all(color: Colors.grey.withOpacity(0.2), width: 2),
               ),
               child: ClipOval(
-                child: Image.network(
-                  'https://i.pravatar.cc/300?img=47',
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: Colors.grey[300],
-                      child: const Icon(
-                        Icons.person,
-                        size: 50,
-                        color: Colors.grey,
+                child: Container(
+                  color: const Color(0xFF5A4BE8).withOpacity(0.1),
+                  child: Center(
+                    child: Text(
+                      name.isNotEmpty ? name[0].toUpperCase() : 'U',
+                      style: const TextStyle(
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF5A4BE8),
                       ),
-                    );
-                  },
-                ),
-              ),
-            ),
-            Positioned(
-              right: 0,
-              bottom: 0,
-              child: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF5A4BE8),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.camera_alt,
-                  color: Colors.white,
-                  size: 16,
+                    ),
+                  ),
                 ),
               ),
             ),
           ],
         ),
         const SizedBox(height: 16),
-        const Text(
-          'Jessica Doe',
-          style: TextStyle(
+        Text(
+          name,
+          style: const TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
             color: Colors.black87,
           ),
         ),
         const SizedBox(height: 4),
-        const Text(
-          'jessica.doe@example.com',
-          style: TextStyle(
+        Text(
+          email,
+          style: const TextStyle(
             fontSize: 14,
             color: Colors.grey,
           ),
