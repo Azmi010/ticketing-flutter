@@ -102,4 +102,61 @@ class OrderRepository {
     final List ordersList = result.data!['myOrders'];
     return ordersList.map((json) => Order.fromJson(json)).toList();
   }
+
+  // Get all orders (admin)
+  Future<List<Order>> getAllOrders() async {
+    final client = await GraphQLConfig.getClient();
+
+    const String allOrdersQuery = r'''
+      query AllOrders {
+        orders {
+          id
+          total_price
+          createdAt
+          user {
+            id
+            name
+            email
+          }
+          details {
+            id
+            qty
+            ticket {
+              id
+              name
+              price
+              event {
+                id
+                title
+                date
+                location
+              }
+            }
+          }
+        }
+      }
+    ''';
+
+    final QueryOptions options = QueryOptions(
+      document: gql(allOrdersQuery),
+      fetchPolicy: FetchPolicy.networkOnly,
+    );
+
+    final QueryResult result = await client.query(options);
+
+    if (result.hasException) {
+      throw Exception(
+        result.exception?.graphqlErrors.isNotEmpty == true
+            ? result.exception!.graphqlErrors.first.message
+            : 'Failed to load orders',
+      );
+    }
+
+    if (result.data == null || result.data!['orders'] == null) {
+      return [];
+    }
+
+    final List ordersList = result.data!['orders'];
+    return ordersList.map((json) => Order.fromJson(json)).toList();
+  }
 }
