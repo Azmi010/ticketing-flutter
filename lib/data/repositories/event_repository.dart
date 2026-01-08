@@ -2,6 +2,8 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:ticketing_flutter/core/config/graphql_config.dart';
 import '../models/category_model.dart';
 import '../models/event_model.dart';
+import '../models/search_event_input_model.dart';
+import '../models/search_event_response_model.dart';
 
 class EventRepository {
   // Get all events
@@ -315,5 +317,47 @@ class EventRepository {
   Future<List<Event>> getFreeEvents() async {
     final allEvents = await getEvents();
     return allEvents;
+  }
+
+  // Search events with filters
+  Future<List<SearchEventResponse>> searchEvents(SearchEventInput input) async {
+    final client = await GraphQLConfig.getClient();
+
+    const String searchEventsQuery = r'''
+      query SearchEvents($input: SearchEventInput!) {
+        searchEvents(input: $input) {
+          id
+          title
+          description
+          location
+          date
+          categoryName
+          organizerName
+        }
+      }
+    ''';
+
+    final QueryOptions options = QueryOptions(
+      document: gql(searchEventsQuery),
+      variables: {'input': input.toJson()},
+      fetchPolicy: FetchPolicy.networkOnly,
+    );
+
+    final QueryResult result = await client.query(options);
+
+    if (result.hasException) {
+      throw Exception(
+        result.exception?.graphqlErrors.isNotEmpty == true
+            ? result.exception!.graphqlErrors.first.message
+            : 'Failed to search events',
+      );
+    }
+
+    if (result.data == null || result.data!['searchEvents'] == null) {
+      return [];
+    }
+
+    final List searchResultsList = result.data!['searchEvents'];
+    return searchResultsList.map((json) => SearchEventResponse.fromJson(json)).toList();
   }
 }

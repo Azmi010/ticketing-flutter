@@ -16,7 +16,9 @@ class ExploreScreen extends StatelessWidget {
       child: MultiBlocProvider(
         providers: [
           BlocProvider<SearchBloc>(
-            create: (context) => SearchBloc(),
+            create: (context) => SearchBloc(
+              eventRepository: context.read<EventRepository>(),
+            ),
           ),
           BlocProvider<CardCategoryBloc>(
             create: (context) => CardCategoryBloc(
