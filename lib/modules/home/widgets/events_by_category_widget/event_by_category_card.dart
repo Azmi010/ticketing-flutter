@@ -26,7 +26,7 @@ class EventByCategoryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -66,7 +66,7 @@ class EventByCategoryCard extends StatelessWidget {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -120,7 +120,7 @@ class EventByCategoryCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 1),
 
                       Row(
                         children: [
@@ -135,6 +135,26 @@ class EventByCategoryCard extends StatelessWidget {
                                 fontSize: 11,
                                 color: Colors.grey,
                               ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 1),
+                      
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.confirmation_number,
+                            size: 11,
+                            color: Colors.deepPurple,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${event.totalTickets} tickets',
+                            style: const TextStyle(
+                              fontSize: 10,
+                              color: Colors.deepPurple,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],

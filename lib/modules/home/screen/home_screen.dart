@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ticketing_flutter/data/repositories/event_repository.dart';
+import 'package:ticketing_flutter/data/repositories/ticket_subscription_service.dart';
 import 'package:ticketing_flutter/modules/home/screen/home_layout.dart';
 import 'package:ticketing_flutter/modules/home/widgets/all_events_widget/bloc/all_events_bloc.dart';
 import 'package:ticketing_flutter/modules/home/widgets/category_widget/bloc/category_bloc.dart';
@@ -11,8 +12,15 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RepositoryProvider(
-      create: (context) => EventRepository(),
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider(
+          create: (context) => EventRepository(),
+        ),
+        RepositoryProvider(
+          create: (context) => TicketSubscriptionService(),
+        ),
+      ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider<AllEventsBloc>(
@@ -28,6 +36,7 @@ class HomeScreen extends StatelessWidget {
           BlocProvider<EventByCategoryBloc>(
             create: (context) => EventByCategoryBloc(
               eventRepository: context.read<EventRepository>(),
+              subscriptionService: context.read<TicketSubscriptionService>(),
             )..add(GetEventsByCategory(0)),
           ),
         ],

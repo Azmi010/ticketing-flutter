@@ -12,3 +12,22 @@ class GetEventsByCategory extends EventByCategoryEvent {
   @override
   List<Object?> get props => [categoryId];
 }
+
+class SubscribeToTicketUpdates extends EventByCategoryEvent {}
+
+class UpdateTicketStock extends EventByCategoryEvent {
+  final int eventId;
+  final int ticketId;
+  final int newStock;
+  
+  UpdateTicketStock({
+    required this.eventId,
+    required this.ticketId,
+    required this.newStock,
+  });
+
+  @override
+  List<Object?> get props => [eventId, ticketId, newStock];
+}
+
+class UnsubscribeFromTicketUpdates extends EventByCategoryEvent {}
