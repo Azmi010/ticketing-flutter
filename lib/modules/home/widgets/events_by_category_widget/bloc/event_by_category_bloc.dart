@@ -76,34 +76,44 @@ class EventByCategoryBloc extends Bloc<EventByCategoryEvent, EventByCategoryStat
     UpdateTicketStock event, 
     Emitter<EventByCategoryState> emit
   ) {
-    final updatedEvents = state.events.map((ev) {
+    final List<Event> updatedEvents = [];
+    
+    for (var ev in state.events) {
       if (ev.id == event.eventId) {
-        final updatedTickets = ev.tickets?.map((ticket) {
-          if (ticket.id == event.ticketId) {
-            return TicketType(
-              id: ticket.id,
-              name: ticket.name,
-              price: ticket.price,
-              quota: event.newStock,
-              eventId: ticket.eventId,
-              event: ticket.event,
-            );
+        final List<TicketType>? updatedTickets = ev.tickets != null
+            ? []
+            : null;
+        
+        if (ev.tickets != null) {
+          for (var ticket in ev.tickets!) {
+            if (ticket.id == event.ticketId) {
+              updatedTickets!.add(TicketType(
+                id: ticket.id,
+                name: ticket.name,
+                price: ticket.price,
+                quota: event.newStock,
+                eventId: ticket.eventId,
+                event: ticket.event,
+              ));
+            } else {
+              updatedTickets!.add(ticket);
+            }
           }
-          return ticket;
-        }).toList();
+        }
         
         final newTotalTickets = updatedTickets?.fold(
           0, 
           (int sum, ticket) => sum + ticket.quota
         ) ?? 0;
         
-        return ev.copyWith(
+        updatedEvents.add(ev.copyWith(
           tickets: updatedTickets,
           totalTickets: newTotalTickets,
-        );
+        ));
+      } else {
+        updatedEvents.add(ev);
       }
-      return ev;
-    }).toList();
+    }
     
     emit(state.copyWith(events: updatedEvents));
   }

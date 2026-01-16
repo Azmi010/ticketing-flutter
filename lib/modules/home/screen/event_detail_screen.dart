@@ -6,9 +6,11 @@ import 'package:ticketing_flutter/data/models/event_model.dart';
 import 'package:ticketing_flutter/data/models/order_input_model.dart';
 import 'package:ticketing_flutter/data/repositories/event_repository.dart';
 import 'package:ticketing_flutter/data/repositories/order_repository.dart';
+import 'package:ticketing_flutter/data/repositories/email_subscription_service.dart';
 import 'package:ticketing_flutter/modules/home/bloc/order/order_bloc.dart';
 import 'package:ticketing_flutter/modules/home/bloc/order/order_event.dart';
 import 'package:ticketing_flutter/modules/home/bloc/order/order_state.dart';
+import 'package:ticketing_flutter/modules/home/screen/order_success_screen.dart';
 
 class EventDetailScreen extends StatefulWidget {
   final int eventId;
@@ -364,7 +366,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               backgroundColor: Colors.green,
             ),
           );
-          Navigator.pop(context);
+          
+          // Navigate ke OrderSuccessScreen dengan order data
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => OrderSuccessScreen(order: state.order),
+            ),
+          );
         } else if (state is OrderError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -472,7 +481,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => OrderBloc(orderRepository: OrderRepository()),
+      create: (context) => OrderBloc(
+        orderRepository: OrderRepository(),
+        emailSubscriptionService: EmailSubscriptionService(),
+      ),
       child: Scaffold(
         backgroundColor: AppColors.background,
         body: isLoading

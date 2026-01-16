@@ -36,7 +36,7 @@ class EventByCategoryCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Flexible(
-            flex: 5,
+            flex: 13,
             child: Stack(
               children: [
                 ClipRRect(
@@ -84,7 +84,7 @@ class EventByCategoryCard extends StatelessWidget {
           ),
 
           Flexible(
-            flex: 4,
+            flex: 12,
             child: Padding(
               padding: const EdgeInsets.all(10),
               child: Column(
